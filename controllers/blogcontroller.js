@@ -21,7 +21,37 @@ export const createBlog = async (req, res) => {
 
 export const getAllBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find(req.query);
+    // BUILDING QUERIES
+
+    // 1A)Filtering
+    const queryObj = { ...req.query };
+    const excludefields = ["page", "sort", "limit", "fields"];
+    excludefields.forEach((el) => delete queryObj[el]);
+
+    // 1B) Advanced Filtering
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+
+    let query = Blog.find(JSON.parse(queryStr));
+
+    // 2)sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort("-updatedAt");
+    }
+
+    // field limiting(projection)
+    if (req.query.fields) {
+      const fields = req.query.fields.split(",").join(" ");
+      query = query.select(fields);
+    } else {
+      query = query.select("-__v");
+    }
+
+    // execute the query
+    const blogs = await query;
     res.status(200).json({
       status: "success",
       results: blogs.length,
@@ -52,7 +82,7 @@ export const getSingleBlog = async (req, res) => {
   }
 };
 
-// update the requested blog
+// update a requested blog
 
 export const updateSingleBlog = async (req, res) => {
   try {
