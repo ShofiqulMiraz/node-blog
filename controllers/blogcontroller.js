@@ -1,4 +1,5 @@
 import { Blog } from "../models/blogmodel.js";
+import { APIFeature } from "../utils/apiFeatures.js";
 
 // create new Blog
 
@@ -19,39 +20,18 @@ export const createBlog = async (req, res) => {
 
 // get All Blogs From Database
 
+// APIFeature
+
 export const getAllBlogs = async (req, res) => {
   try {
-    // BUILDING QUERIES
+    const features = new APIFeature(Blog.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
 
-    // 1A)Filtering
-    const queryObj = { ...req.query };
-    const excludefields = ["page", "sort", "limit", "fields"];
-    excludefields.forEach((el) => delete queryObj[el]);
+    const blogs = await features.query;
 
-    // 1B) Advanced Filtering
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-
-    let query = Blog.find(JSON.parse(queryStr));
-
-    // 2)sorting
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(",").join(" ");
-      query = query.sort(sortBy);
-    } else {
-      query = query.sort("-updatedAt");
-    }
-
-    // field limiting(projection)
-    if (req.query.fields) {
-      const fields = req.query.fields.split(",").join(" ");
-      query = query.select(fields);
-    } else {
-      query = query.select("-__v");
-    }
-
-    // execute the query
-    const blogs = await query;
     res.status(200).json({
       status: "success",
       results: blogs.length,
