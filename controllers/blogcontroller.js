@@ -13,14 +13,12 @@ export const createBlog = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       status: "fail",
-      message: error.message,
+      message: error,
     });
   }
 };
 
 // get All Blogs From Database
-
-// APIFeature
 
 export const getAllBlogs = async (req, res) => {
   try {
@@ -40,7 +38,7 @@ export const getAllBlogs = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       status: "fail",
-      message: error.message,
+      message: error,
     });
   }
 };
@@ -57,7 +55,7 @@ export const getSingleBlog = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       status: "fail",
-      message: error.message,
+      message: error,
     });
   }
 };
@@ -77,7 +75,7 @@ export const updateSingleBlog = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       status: "fail",
-      message: error.message,
+      message: error,
     });
   }
 };
@@ -94,7 +92,7 @@ export const deleteSingleBlog = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       status: "fail",
-      message: error.message,
+      message: error,
     });
   }
 };
